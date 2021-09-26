@@ -51,7 +51,7 @@ body:
       label: Expected behavior
       description: Enter a description of what you expected to happen.
   - type: textarea
-      validations:
+    validations:
       required: true
     attributes:
       label: Actual behavior
