@@ -17,7 +17,7 @@ body:
       label: Operating system version
       description: On what operating system did this bug occur? Provide information of the affected OS and its version here.
       placeholder: |
-        Windows 11 (Build `10.0.22463.1000.rs_prerelease.210917-1503`), Ubuntu 20.04 LTS
+        Windows 11 (Build 10.0.22463.1000.rs_prerelease.210917-1503), Ubuntu 20.04 LTS
   - type: textarea
     validations:
       required: true
