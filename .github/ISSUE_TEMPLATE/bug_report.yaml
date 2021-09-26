@@ -3,10 +3,6 @@ description: Report a bug or unexpected behavior
 title: "Bug title"
 labels: []
 body:
-  - type: markdown
-    attributes:
-      value: |
-        ### Bug report
   - type: textarea
     validations:
       required: true
