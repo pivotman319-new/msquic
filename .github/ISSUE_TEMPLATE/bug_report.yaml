@@ -45,7 +45,7 @@ body:
       value: |
         ### Behavior
   - type: textarea
-      validations:
+    validations:
       required: true
     attributes:
       label: Expected behavior
