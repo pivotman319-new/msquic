@@ -46,16 +46,18 @@ body:
     attributes:
       label: Expected behavior
       description: Enter a description of what you expected to happen.
+      placeholder: The call to X from Y should succeed.
   - type: textarea
     validations:
       required: true
     attributes:
-      label: Actual behavior
+      label: Actual outcome
       description: Enter a description of what actually happened when reproducing this issue.
+      placeholder: The program crashed after parameter Z was being set in X.
   - type: textarea
     attributes:
-      label: Screenshots
-      description: If applicable, add screenshots here to help explain your problem.
+      label: Screenshots/Log Output
+      description: If applicable, add screenshots or log output here to help further explain your problem.
   - type: textarea
     attributes:
       label: Additional details
