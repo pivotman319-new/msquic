@@ -142,14 +142,14 @@ typedef struct CXPLAT_SEND_DATA CXPLAT_SEND_DATA;
 typedef struct QUIC_BUFFER QUIC_BUFFER;
 
 //
-// Structure to represent data buffers received.
+// Structure to represent a network route.
 //
-typedef struct CXPLAT_TUPLE {
+typedef struct CXPLAT_ROUTE {
 
     QUIC_ADDR RemoteAddress;
     QUIC_ADDR LocalAddress;
 
-} CXPLAT_TUPLE;
+} CXPLAT_ROUTE;
 
 //
 // Structure to represent received UDP datagrams or TCP data.
@@ -162,9 +162,9 @@ typedef struct CXPLAT_RECV_DATA {
     struct CXPLAT_RECV_DATA* Next;
 
     //
-    // Contains the 4 tuple.
+    // Contains the network route.
     //
-    CXPLAT_TUPLE* Tuple;
+    CXPLAT_ROUTE* Route;
 
     //
     // The data buffer containing the received bytes.
@@ -381,7 +381,7 @@ CxPlatDataPathResolveAddress(
     _In_z_ const char* HostName,
     _Inout_ QUIC_ADDR* Address
     );
-    
+
 //
 // Values from RFC 2863
 //
@@ -554,7 +554,8 @@ CXPLAT_SEND_DATA*
 CxPlatSendDataAlloc(
     _In_ CXPLAT_SOCKET* Socket,
     _In_ CXPLAT_ECN_TYPE ECN,
-    _In_ uint16_t MaxPacketSize
+    _In_ uint16_t MaxPacketSize,
+    _Inout_ CXPLAT_ROUTE* Route
     );
 
 //
@@ -603,8 +604,7 @@ _IRQL_requires_max_(DISPATCH_LEVEL)
 QUIC_STATUS
 CxPlatSocketSend(
     _In_ CXPLAT_SOCKET* Socket,
-    _In_ const QUIC_ADDR* LocalAddress,
-    _In_ const QUIC_ADDR* RemoteAddress,
+    _In_ const CXPLAT_ROUTE* Route,
     _In_ CXPLAT_SEND_DATA* SendData,
     _In_ uint16_t PartitionId
     );

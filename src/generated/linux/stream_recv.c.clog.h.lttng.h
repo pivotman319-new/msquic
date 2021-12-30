@@ -116,6 +116,25 @@ TRACEPOINT_EVENT(CLOG_STREAM_RECV_C, LocalCloseStopSending,
 
 
 /*----------------------------------------------------------
+// Decoder Ring for TreatFinAsReset
+// [strm][%p] Treating FIN after receive abort as reset
+// QuicTraceLogStreamInfo(
+                TreatFinAsReset,
+                Stream,
+                "Treating FIN after receive abort as reset");
+// arg1 = arg1 = Stream
+----------------------------------------------------------*/
+TRACEPOINT_EVENT(CLOG_STREAM_RECV_C, TreatFinAsReset,
+    TP_ARGS(
+        const void *, arg1), 
+    TP_FIELDS(
+        ctf_integer_hex(uint64_t, arg1, arg1)
+    )
+)
+
+
+
+/*----------------------------------------------------------
 // Decoder Ring for QueueRecvFlush
 // [strm][%p] Queuing recv flush
 // QuicTraceLogStreamVerbose(
@@ -190,6 +209,25 @@ TRACEPOINT_EVENT(CLOG_STREAM_RECV_C, IndicatePeerReceiveAborted,
 // arg1 = arg1 = Stream
 ----------------------------------------------------------*/
 TRACEPOINT_EVENT(CLOG_STREAM_RECV_C, IgnoreRecvAfterClose,
+    TP_ARGS(
+        const void *, arg1), 
+    TP_FIELDS(
+        ctf_integer_hex(uint64_t, arg1, arg1)
+    )
+)
+
+
+
+/*----------------------------------------------------------
+// Decoder Ring for IgnoreRecvAfterAbort
+// [strm][%p] Ignoring received frame after receive abort
+// QuicTraceLogStreamVerbose(
+                IgnoreRecvAfterAbort,
+                Stream,
+                "Ignoring received frame after receive abort");
+// arg1 = arg1 = Stream
+----------------------------------------------------------*/
+TRACEPOINT_EVENT(CLOG_STREAM_RECV_C, IgnoreRecvAfterAbort,
     TP_ARGS(
         const void *, arg1), 
     TP_FIELDS(
@@ -346,60 +384,6 @@ TRACEPOINT_EVENT(CLOG_STREAM_RECV_C, IgnoreRecvFlush,
 
 
 /*----------------------------------------------------------
-// Decoder Ring for IndicateReceive
-// [strm][%p] Indicating QUIC_STREAM_EVENT_RECEIVE [%llu bytes, %u buffers, 0x%x flags]
-// QuicTraceLogStreamVerbose(
-            IndicateReceive,
-            Stream,
-            "Indicating QUIC_STREAM_EVENT_RECEIVE [%llu bytes, %u buffers, 0x%x flags]",
-            Event.RECEIVE.TotalBufferLength,
-            Event.RECEIVE.BufferCount,
-            Event.RECEIVE.Flags);
-// arg1 = arg1 = Stream
-// arg3 = arg3 = Event.RECEIVE.TotalBufferLength
-// arg4 = arg4 = Event.RECEIVE.BufferCount
-// arg5 = arg5 = Event.RECEIVE.Flags
-----------------------------------------------------------*/
-TRACEPOINT_EVENT(CLOG_STREAM_RECV_C, IndicateReceive,
-    TP_ARGS(
-        const void *, arg1,
-        unsigned long long, arg3,
-        unsigned int, arg4,
-        unsigned int, arg5), 
-    TP_FIELDS(
-        ctf_integer_hex(uint64_t, arg1, arg1)
-        ctf_integer(uint64_t, arg3, arg3)
-        ctf_integer(unsigned int, arg4, arg4)
-        ctf_integer(unsigned int, arg5, arg5)
-    )
-)
-
-
-
-/*----------------------------------------------------------
-// Decoder Ring for ReceiveComplete
-// [strm][%p] Recv complete (%llu bytes)
-// QuicTraceLogStreamVerbose(
-        ReceiveComplete,
-        Stream,
-        "Recv complete (%llu bytes)",
-        BufferLength);
-// arg1 = arg1 = Stream
-// arg3 = arg3 = BufferLength
-----------------------------------------------------------*/
-TRACEPOINT_EVENT(CLOG_STREAM_RECV_C, ReceiveComplete,
-    TP_ARGS(
-        const void *, arg1,
-        unsigned long long, arg3), 
-    TP_FIELDS(
-        ctf_integer_hex(uint64_t, arg1, arg1)
-        ctf_integer(uint64_t, arg3, arg3)
-    )
-)
-
-
-
-/*----------------------------------------------------------
 // Decoder Ring for IndicatePeerSendShutdown
 // [strm][%p] Indicating QUIC_STREAM_EVENT_PEER_SEND_SHUTDOWN
 // QuicTraceLogStreamVerbose(
@@ -482,5 +466,82 @@ TRACEPOINT_EVENT(CLOG_STREAM_RECV_C, StreamError,
     TP_FIELDS(
         ctf_integer_hex(uint64_t, arg2, arg2)
         ctf_string(arg3, arg3)
+    )
+)
+
+
+
+/*----------------------------------------------------------
+// Decoder Ring for StreamReceiveFrame
+// [strm][%p] Processing frame in packet %llu
+// QuicTraceEvent(
+        StreamReceiveFrame,
+        "[strm][%p] Processing frame in packet %llu",
+        Stream,
+        Packet->PacketId);
+// arg2 = arg2 = Stream
+// arg3 = arg3 = Packet->PacketId
+----------------------------------------------------------*/
+TRACEPOINT_EVENT(CLOG_STREAM_RECV_C, StreamReceiveFrame,
+    TP_ARGS(
+        const void *, arg2,
+        unsigned long long, arg3), 
+    TP_FIELDS(
+        ctf_integer_hex(uint64_t, arg2, arg2)
+        ctf_integer(uint64_t, arg3, arg3)
+    )
+)
+
+
+
+/*----------------------------------------------------------
+// Decoder Ring for StreamAppReceive
+// [strm][%p] Indicating QUIC_STREAM_EVENT_RECEIVE [%llu bytes, %u buffers, 0x%x flags]
+// QuicTraceEvent(
+            StreamAppReceive,
+            "[strm][%p] Indicating QUIC_STREAM_EVENT_RECEIVE [%llu bytes, %u buffers, 0x%x flags]",
+            Stream,
+            Event.RECEIVE.TotalBufferLength,
+            Event.RECEIVE.BufferCount,
+            Event.RECEIVE.Flags);
+// arg2 = arg2 = Stream
+// arg3 = arg3 = Event.RECEIVE.TotalBufferLength
+// arg4 = arg4 = Event.RECEIVE.BufferCount
+// arg5 = arg5 = Event.RECEIVE.Flags
+----------------------------------------------------------*/
+TRACEPOINT_EVENT(CLOG_STREAM_RECV_C, StreamAppReceive,
+    TP_ARGS(
+        const void *, arg2,
+        unsigned long long, arg3,
+        unsigned int, arg4,
+        unsigned int, arg5), 
+    TP_FIELDS(
+        ctf_integer_hex(uint64_t, arg2, arg2)
+        ctf_integer(uint64_t, arg3, arg3)
+        ctf_integer(unsigned int, arg4, arg4)
+        ctf_integer(unsigned int, arg5, arg5)
+    )
+)
+
+
+
+/*----------------------------------------------------------
+// Decoder Ring for StreamAppReceiveComplete
+// [strm][%p] Receive complete [%llu bytes]
+// QuicTraceEvent(
+        StreamAppReceiveComplete,
+        "[strm][%p] Receive complete [%llu bytes]",
+        Stream,
+        BufferLength);
+// arg2 = arg2 = Stream
+// arg3 = arg3 = BufferLength
+----------------------------------------------------------*/
+TRACEPOINT_EVENT(CLOG_STREAM_RECV_C, StreamAppReceiveComplete,
+    TP_ARGS(
+        const void *, arg2,
+        unsigned long long, arg3), 
+    TP_FIELDS(
+        ctf_integer_hex(uint64_t, arg2, arg2)
+        ctf_integer(uint64_t, arg3, arg3)
     )
 )

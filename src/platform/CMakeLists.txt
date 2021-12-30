@@ -29,11 +29,11 @@ elseif(QUIC_TLS STREQUAL "openssl")
     message(STATUS "Configuring for OpenSSL")
     set(SOURCES ${SOURCES} tls_openssl.c crypt_openssl.c)
     if ("${CX_PLATFORM}" STREQUAL "windows")
-        set(SOURCES ${SOURCES} cert_capi_openssl.c cert_capi.c  selfsign_capi.c)
+        set(SOURCES ${SOURCES} certificates_capi.c cert_capi.c  selfsign_capi.c)
     elseif(CX_PLATFORM STREQUAL "linux")
-        set(SOURCES ${SOURCES} posix_openssl.c selfsign_openssl.c)
+        set(SOURCES ${SOURCES} certificates_posix.c selfsign_openssl.c)
     else()
-        set(SOURCES ${SOURCES} darwin_openssl.c selfsign_openssl.c)
+        set(SOURCES ${SOURCES} certificates_darwin.c selfsign_openssl.c)
     endif()
 else()
     message(FATAL_ERROR "TLS Provider not configured")
@@ -43,7 +43,7 @@ add_library(platform STATIC ${SOURCES})
 
 target_link_libraries(platform PUBLIC inc)
 
-target_link_libraries(platform PRIVATE warnings)
+target_link_libraries(platform PRIVATE warnings main_binary_link_args)
 
 set_property(TARGET platform PROPERTY FOLDER "${QUIC_FOLDER_PREFIX}libraries")
 

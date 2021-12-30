@@ -814,9 +814,9 @@ TRACEPOINT_EVENT(CLOG_CONNECTION_C, UpdateStreamSchedulingScheme,
             LocalInterfaceSet,
             Connection,
             "Local interface set to %u",
-            Connection->Paths[0].LocalAddress.Ipv6.sin6_scope_id);
+            Connection->Paths[0].Route.LocalAddress.Ipv6.sin6_scope_id);
 // arg1 = arg1 = Connection
-// arg3 = arg3 = Connection->Paths[0].LocalAddress.Ipv6.sin6_scope_id
+// arg3 = arg3 = Connection->Paths[0].Route.LocalAddress.Ipv6.sin6_scope_id
 ----------------------------------------------------------*/
 TRACEPOINT_EVENT(CLOG_CONNECTION_C, LocalInterfaceSet,
     TP_ARGS(
@@ -915,29 +915,6 @@ TRACEPOINT_EVENT(CLOG_CONNECTION_C, ZeroLengthCidRetire,
         const void *, arg1), 
     TP_FIELDS(
         ctf_integer_hex(uint64_t, arg1, arg1)
-    )
-)
-
-
-
-/*----------------------------------------------------------
-// Decoder Ring for TimerExpired
-// [conn][%p] %s timer expired
-// QuicTraceLogConnVerbose(
-            TimerExpired,
-            Connection,
-            "%s timer expired",
-            TimerNames[Temp[j].Type]);
-// arg1 = arg1 = Connection
-// arg3 = arg3 = TimerNames[Temp[j].Type]
-----------------------------------------------------------*/
-TRACEPOINT_EVENT(CLOG_CONNECTION_C, TimerExpired,
-    TP_ARGS(
-        const void *, arg1,
-        const char *, arg3), 
-    TP_FIELDS(
-        ctf_integer_hex(uint64_t, arg1, arg1)
-        ctf_string(arg3, arg3)
     )
 )
 
@@ -1628,9 +1605,9 @@ TRACEPOINT_EVENT(CLOG_CONNECTION_C, ConnCreated,
             ConnLocalAddrAdded,
             "[conn][%p] New Local IP: %!ADDR!",
             Connection,
-            CASTED_CLOG_BYTEARRAY(sizeof(Path->LocalAddress), &Path->LocalAddress));
+            CASTED_CLOG_BYTEARRAY(sizeof(Path->Route.LocalAddress), &Path->Route.LocalAddress));
 // arg2 = arg2 = Connection
-// arg3 = arg3 = CASTED_CLOG_BYTEARRAY(sizeof(Path->LocalAddress), &Path->LocalAddress)
+// arg3 = arg3 = CASTED_CLOG_BYTEARRAY(sizeof(Path->Route.LocalAddress), &Path->Route.LocalAddress)
 ----------------------------------------------------------*/
 TRACEPOINT_EVENT(CLOG_CONNECTION_C, ConnLocalAddrAdded,
     TP_ARGS(
@@ -1653,9 +1630,9 @@ TRACEPOINT_EVENT(CLOG_CONNECTION_C, ConnLocalAddrAdded,
             ConnRemoteAddrAdded,
             "[conn][%p] New Remote IP: %!ADDR!",
             Connection,
-            CASTED_CLOG_BYTEARRAY(sizeof(Path->RemoteAddress), &Path->RemoteAddress));
+            CASTED_CLOG_BYTEARRAY(sizeof(Path->Route.RemoteAddress), &Path->Route.RemoteAddress));
 // arg2 = arg2 = Connection
-// arg3 = arg3 = CASTED_CLOG_BYTEARRAY(sizeof(Path->RemoteAddress), &Path->RemoteAddress)
+// arg3 = arg3 = CASTED_CLOG_BYTEARRAY(sizeof(Path->Route.RemoteAddress), &Path->Route.RemoteAddress)
 ----------------------------------------------------------*/
 TRACEPOINT_EVENT(CLOG_CONNECTION_C, ConnRemoteAddrAdded,
     TP_ARGS(
@@ -1813,10 +1790,10 @@ TRACEPOINT_EVENT(CLOG_CONNECTION_C, ConnHandleClosed,
 // Decoder Ring for ConnRegistered
 // [conn][%p] Registered with %p
 // QuicTraceEvent(
-        ConnRegistered,
-        "[conn][%p] Registered with %p",
-        Connection,
-        Registration);
+            ConnRegistered,
+            "[conn][%p] Registered with %p",
+            Connection,
+            Registration);
 // arg2 = arg2 = Connection
 // arg3 = arg3 = Registration
 ----------------------------------------------------------*/
@@ -1971,6 +1948,79 @@ TRACEPOINT_EVENT(CLOG_CONNECTION_C, ConnDestCidRemoved,
         ctf_integer(uint64_t, arg3, arg3)
         ctf_integer(unsigned int, arg4_len, arg4_len)
         ctf_sequence(char, arg4, arg4, unsigned int, arg4_len)
+    )
+)
+
+
+
+/*----------------------------------------------------------
+// Decoder Ring for ConnSetTimer
+// [conn][%p] Setting %hhu, delay=%llu us
+// QuicTraceEvent(
+        ConnSetTimer,
+        "[conn][%p] Setting %hhu, delay=%llu us",
+        Connection,
+        (uint8_t)Type,
+        Delay);
+// arg2 = arg2 = Connection
+// arg3 = arg3 = (uint8_t)Type
+// arg4 = arg4 = Delay
+----------------------------------------------------------*/
+TRACEPOINT_EVENT(CLOG_CONNECTION_C, ConnSetTimer,
+    TP_ARGS(
+        const void *, arg2,
+        unsigned char, arg3,
+        unsigned long long, arg4), 
+    TP_FIELDS(
+        ctf_integer_hex(uint64_t, arg2, arg2)
+        ctf_integer(unsigned char, arg3, arg3)
+        ctf_integer(uint64_t, arg4, arg4)
+    )
+)
+
+
+
+/*----------------------------------------------------------
+// Decoder Ring for ConnCancelTimer
+// [conn][%p] Canceling %hhu
+// QuicTraceEvent(
+                ConnCancelTimer,
+                "[conn][%p] Canceling %hhu",
+                Connection,
+                (uint8_t)Type);
+// arg2 = arg2 = Connection
+// arg3 = arg3 = (uint8_t)Type
+----------------------------------------------------------*/
+TRACEPOINT_EVENT(CLOG_CONNECTION_C, ConnCancelTimer,
+    TP_ARGS(
+        const void *, arg2,
+        unsigned char, arg3), 
+    TP_FIELDS(
+        ctf_integer_hex(uint64_t, arg2, arg2)
+        ctf_integer(unsigned char, arg3, arg3)
+    )
+)
+
+
+
+/*----------------------------------------------------------
+// Decoder Ring for ConnExpiredTimer
+// [conn][%p] %hhu expired
+// QuicTraceEvent(
+            ConnExpiredTimer,
+            "[conn][%p] %hhu expired",
+            Connection,
+            (uint8_t)Temp[j].Type);
+// arg2 = arg2 = Connection
+// arg3 = arg3 = (uint8_t)Temp[j].Type
+----------------------------------------------------------*/
+TRACEPOINT_EVENT(CLOG_CONNECTION_C, ConnExpiredTimer,
+    TP_ARGS(
+        const void *, arg2,
+        unsigned char, arg3), 
+    TP_FIELDS(
+        ctf_integer_hex(uint64_t, arg2, arg2)
+        ctf_integer(unsigned char, arg3, arg3)
     )
 )
 
@@ -2145,6 +2195,25 @@ TRACEPOINT_EVENT(CLOG_CONNECTION_C, ConnHandshakeStart,
 
 
 /*----------------------------------------------------------
+// Decoder Ring for PacketDecrypt
+// [pack][%llu] Decrypting
+// QuicTraceEvent(
+        PacketDecrypt,
+        "[pack][%llu] Decrypting",
+        Packet->PacketId);
+// arg2 = arg2 = Packet->PacketId
+----------------------------------------------------------*/
+TRACEPOINT_EVENT(CLOG_CONNECTION_C, PacketDecrypt,
+    TP_ARGS(
+        unsigned long long, arg2), 
+    TP_FIELDS(
+        ctf_integer(uint64_t, arg2, arg2)
+    )
+)
+
+
+
+/*----------------------------------------------------------
 // Decoder Ring for ConnPacketRecv
 // [conn][%p][RX][%llu] %c (%hu bytes)
 // QuicTraceEvent(
@@ -2182,9 +2251,9 @@ TRACEPOINT_EVENT(CLOG_CONNECTION_C, ConnPacketRecv,
                 ConnLocalAddrRemoved,
                 "[conn][%p] Removed Local IP: %!ADDR!",
                 Connection,
-                CASTED_CLOG_BYTEARRAY(sizeof(Connection->Paths[0].LocalAddress), &Connection->Paths[0].LocalAddress));
+                CASTED_CLOG_BYTEARRAY(sizeof(Connection->Paths[0].Route.LocalAddress), &Connection->Paths[0].Route.LocalAddress));
 // arg2 = arg2 = Connection
-// arg3 = arg3 = CASTED_CLOG_BYTEARRAY(sizeof(Connection->Paths[0].LocalAddress), &Connection->Paths[0].LocalAddress)
+// arg3 = arg3 = CASTED_CLOG_BYTEARRAY(sizeof(Connection->Paths[0].Route.LocalAddress), &Connection->Paths[0].Route.LocalAddress)
 ----------------------------------------------------------*/
 TRACEPOINT_EVENT(CLOG_CONNECTION_C, ConnLocalAddrRemoved,
     TP_ARGS(

@@ -157,6 +157,27 @@ tracepoint(CLOG_STREAM_RECV_C, LocalCloseStopSending , arg1);\
 
 
 
+#ifndef _clog_3_ARGS_TRACE_TreatFinAsReset
+
+
+
+/*----------------------------------------------------------
+// Decoder Ring for TreatFinAsReset
+// [strm][%p] Treating FIN after receive abort as reset
+// QuicTraceLogStreamInfo(
+                TreatFinAsReset,
+                Stream,
+                "Treating FIN after receive abort as reset");
+// arg1 = arg1 = Stream
+----------------------------------------------------------*/
+#define _clog_3_ARGS_TRACE_TreatFinAsReset(uniqueId, arg1, encoded_arg_string)\
+tracepoint(CLOG_STREAM_RECV_C, TreatFinAsReset , arg1);\
+
+#endif
+
+
+
+
 #ifndef _clog_3_ARGS_TRACE_QueueRecvFlush
 
 
@@ -239,6 +260,27 @@ tracepoint(CLOG_STREAM_RECV_C, IndicatePeerReceiveAborted , arg1, arg3);\
 ----------------------------------------------------------*/
 #define _clog_3_ARGS_TRACE_IgnoreRecvAfterClose(uniqueId, arg1, encoded_arg_string)\
 tracepoint(CLOG_STREAM_RECV_C, IgnoreRecvAfterClose , arg1);\
+
+#endif
+
+
+
+
+#ifndef _clog_3_ARGS_TRACE_IgnoreRecvAfterAbort
+
+
+
+/*----------------------------------------------------------
+// Decoder Ring for IgnoreRecvAfterAbort
+// [strm][%p] Ignoring received frame after receive abort
+// QuicTraceLogStreamVerbose(
+                IgnoreRecvAfterAbort,
+                Stream,
+                "Ignoring received frame after receive abort");
+// arg1 = arg1 = Stream
+----------------------------------------------------------*/
+#define _clog_3_ARGS_TRACE_IgnoreRecvAfterAbort(uniqueId, arg1, encoded_arg_string)\
+tracepoint(CLOG_STREAM_RECV_C, IgnoreRecvAfterAbort , arg1);\
 
 #endif
 
@@ -387,56 +429,6 @@ tracepoint(CLOG_STREAM_RECV_C, IgnoreRecvFlush , arg1);\
 
 
 
-#ifndef _clog_6_ARGS_TRACE_IndicateReceive
-
-
-
-/*----------------------------------------------------------
-// Decoder Ring for IndicateReceive
-// [strm][%p] Indicating QUIC_STREAM_EVENT_RECEIVE [%llu bytes, %u buffers, 0x%x flags]
-// QuicTraceLogStreamVerbose(
-            IndicateReceive,
-            Stream,
-            "Indicating QUIC_STREAM_EVENT_RECEIVE [%llu bytes, %u buffers, 0x%x flags]",
-            Event.RECEIVE.TotalBufferLength,
-            Event.RECEIVE.BufferCount,
-            Event.RECEIVE.Flags);
-// arg1 = arg1 = Stream
-// arg3 = arg3 = Event.RECEIVE.TotalBufferLength
-// arg4 = arg4 = Event.RECEIVE.BufferCount
-// arg5 = arg5 = Event.RECEIVE.Flags
-----------------------------------------------------------*/
-#define _clog_6_ARGS_TRACE_IndicateReceive(uniqueId, arg1, encoded_arg_string, arg3, arg4, arg5)\
-tracepoint(CLOG_STREAM_RECV_C, IndicateReceive , arg1, arg3, arg4, arg5);\
-
-#endif
-
-
-
-
-#ifndef _clog_4_ARGS_TRACE_ReceiveComplete
-
-
-
-/*----------------------------------------------------------
-// Decoder Ring for ReceiveComplete
-// [strm][%p] Recv complete (%llu bytes)
-// QuicTraceLogStreamVerbose(
-        ReceiveComplete,
-        Stream,
-        "Recv complete (%llu bytes)",
-        BufferLength);
-// arg1 = arg1 = Stream
-// arg3 = arg3 = BufferLength
-----------------------------------------------------------*/
-#define _clog_4_ARGS_TRACE_ReceiveComplete(uniqueId, arg1, encoded_arg_string, arg3)\
-tracepoint(CLOG_STREAM_RECV_C, ReceiveComplete , arg1, arg3);\
-
-#endif
-
-
-
-
 #ifndef _clog_3_ARGS_TRACE_IndicatePeerSendShutdown
 
 
@@ -543,6 +535,79 @@ tracepoint(CLOG_STREAM_RECV_C, AllocFailure , arg2, arg3);\
 ----------------------------------------------------------*/
 #define _clog_4_ARGS_TRACE_StreamError(uniqueId, encoded_arg_string, arg2, arg3)\
 tracepoint(CLOG_STREAM_RECV_C, StreamError , arg2, arg3);\
+
+#endif
+
+
+
+
+#ifndef _clog_4_ARGS_TRACE_StreamReceiveFrame
+
+
+
+/*----------------------------------------------------------
+// Decoder Ring for StreamReceiveFrame
+// [strm][%p] Processing frame in packet %llu
+// QuicTraceEvent(
+        StreamReceiveFrame,
+        "[strm][%p] Processing frame in packet %llu",
+        Stream,
+        Packet->PacketId);
+// arg2 = arg2 = Stream
+// arg3 = arg3 = Packet->PacketId
+----------------------------------------------------------*/
+#define _clog_4_ARGS_TRACE_StreamReceiveFrame(uniqueId, encoded_arg_string, arg2, arg3)\
+tracepoint(CLOG_STREAM_RECV_C, StreamReceiveFrame , arg2, arg3);\
+
+#endif
+
+
+
+
+#ifndef _clog_6_ARGS_TRACE_StreamAppReceive
+
+
+
+/*----------------------------------------------------------
+// Decoder Ring for StreamAppReceive
+// [strm][%p] Indicating QUIC_STREAM_EVENT_RECEIVE [%llu bytes, %u buffers, 0x%x flags]
+// QuicTraceEvent(
+            StreamAppReceive,
+            "[strm][%p] Indicating QUIC_STREAM_EVENT_RECEIVE [%llu bytes, %u buffers, 0x%x flags]",
+            Stream,
+            Event.RECEIVE.TotalBufferLength,
+            Event.RECEIVE.BufferCount,
+            Event.RECEIVE.Flags);
+// arg2 = arg2 = Stream
+// arg3 = arg3 = Event.RECEIVE.TotalBufferLength
+// arg4 = arg4 = Event.RECEIVE.BufferCount
+// arg5 = arg5 = Event.RECEIVE.Flags
+----------------------------------------------------------*/
+#define _clog_6_ARGS_TRACE_StreamAppReceive(uniqueId, encoded_arg_string, arg2, arg3, arg4, arg5)\
+tracepoint(CLOG_STREAM_RECV_C, StreamAppReceive , arg2, arg3, arg4, arg5);\
+
+#endif
+
+
+
+
+#ifndef _clog_4_ARGS_TRACE_StreamAppReceiveComplete
+
+
+
+/*----------------------------------------------------------
+// Decoder Ring for StreamAppReceiveComplete
+// [strm][%p] Receive complete [%llu bytes]
+// QuicTraceEvent(
+        StreamAppReceiveComplete,
+        "[strm][%p] Receive complete [%llu bytes]",
+        Stream,
+        BufferLength);
+// arg2 = arg2 = Stream
+// arg3 = arg3 = BufferLength
+----------------------------------------------------------*/
+#define _clog_4_ARGS_TRACE_StreamAppReceiveComplete(uniqueId, encoded_arg_string, arg2, arg3)\
+tracepoint(CLOG_STREAM_RECV_C, StreamAppReceiveComplete , arg2, arg3);\
 
 #endif
 

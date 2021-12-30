@@ -86,10 +86,6 @@ QuicSendReset(
     Send->SendFlags = 0;
     Send->LastFlushTime = 0;
     if (Send->DelayedAckTimerActive) {
-        QuicTraceLogConnVerbose(
-            CancelAckDelayTimer,
-            QuicSendGetConnection(Send),
-            "Canceling ACK_DELAY timer");
         QuicConnTimerCancel(QuicSendGetConnection(Send), QUIC_CONN_TIMER_ACK_DELAY);
         Send->DelayedAckTimerActive = FALSE;
     }
@@ -290,10 +286,6 @@ QuicSendSetSendFlag(
         !QuicConnIsClosed(Connection) || IsCloseFrame;
 
     if (SendFlags & QUIC_CONN_SEND_FLAG_ACK && Send->DelayedAckTimerActive) {
-        QuicTraceLogConnVerbose(
-            CancelAckDelayTimer,
-            Connection,
-            "Canceling ACK_DELAY timer");
         QuicConnTimerCancel(Connection, QUIC_CONN_TIMER_ACK_DELAY);
         Send->DelayedAckTimerActive = FALSE;
     }
@@ -359,10 +351,6 @@ QuicSendUpdateAckState(
             CXPLAT_DBG_ASSERT(!Send->DelayedAckTimerActive);
             Send->SendFlags &= ~QUIC_CONN_SEND_FLAG_ACK;
         } else if (Send->DelayedAckTimerActive) {
-            QuicTraceLogConnVerbose(
-                CancelAckDelayTimer,
-                Connection,
-                "Canceling ACK_DELAY timer");
             QuicConnTimerCancel(Connection, QUIC_CONN_TIMER_ACK_DELAY);
             Send->DelayedAckTimerActive = FALSE;
         }
@@ -554,6 +542,8 @@ QuicSendWriteFrames(
             Send->SendFlags &= ~(QUIC_CONN_SEND_FLAG_CONNECTION_CLOSE | QUIC_CONN_SEND_FLAG_APPLICATION_CLOSE);
             (void)QuicPacketBuilderAddFrame(
                 Builder, IsApplicationClose ? QUIC_FRAME_CONNECTION_CLOSE_1 : QUIC_FRAME_CONNECTION_CLOSE, FALSE);
+        } else {
+            return FALSE; // Ran out of room.
         }
 
         return TRUE;
@@ -769,7 +759,7 @@ QuicSendWriteFrames(
             if (!HasMoreCidsToSend) {
                 Send->SendFlags &= ~QUIC_CONN_SEND_FLAG_NEW_CONNECTION_ID;
             }
-            if (MaxFrameLimitHit || RanOutOfRoom) {
+            if (MaxFrameLimitHit) {
                 return TRUE;
             }
         }
@@ -820,7 +810,7 @@ QuicSendWriteFrames(
             if (!HasMoreCidsToSend) {
                 Send->SendFlags &= ~QUIC_CONN_SEND_FLAG_RETIRE_CONNECTION_ID;
             }
-            if (MaxFrameLimitHit || RanOutOfRoom) {
+            if (MaxFrameLimitHit) {
                 return TRUE;
             }
         }
@@ -1018,7 +1008,7 @@ QuicSendPathChallenges(
             //
             Builder.MinimumDatagramLength =
                 MaxUdpPayloadSizeForFamily(
-                    QuicAddrGetFamily(&Builder.Path->RemoteAddress),
+                    QuicAddrGetFamily(&Builder.Path->Route.RemoteAddress),
                     Builder.Path->Mtu);
 
             if ((uint32_t)Builder.MinimumDatagramLength > Builder.Datagram->Length) {
@@ -1123,10 +1113,10 @@ QuicSendFlush(
     }
     _Analysis_assume_(Builder.Metadata != NULL);
 
-    QuicTraceLogConnVerbose(
-        FlushSend,
+    QuicTraceEvent(
+        ConnFlushSend,
+        "[conn][%p] Flushing Send. Allowance=%u bytes",
         Connection,
-        "Flushing send. Allowance=%u bytes",
         Builder.SendAllowance);
 
 #if DEBUG
@@ -1172,11 +1162,6 @@ QuicSendFlush(
                     //
                     QuicConnAddOutFlowBlockedReason(
                         Connection, QUIC_FLOW_BLOCKED_PACING);
-                    QuicTraceLogConnVerbose(
-                        SetPacingTimer,
-                        Connection,
-                        "Setting delayed send (PACING) timer for %u ms",
-                        QUIC_SEND_PACING_INTERVAL);
                     QuicConnTimerSet(
                         Connection,
                         QUIC_CONN_TIMER_PACING,

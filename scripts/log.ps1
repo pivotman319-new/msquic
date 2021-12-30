@@ -46,7 +46,7 @@ param (
     [switch]$Stream = $false,
 
     [Parameter(Mandatory = $false, ParameterSetName='Start')]
-    [ValidateSet("Basic.Light", "Datapath.Light", "Datapath.Verbose", "Stacks.Light", "Performance.Light", "Basic.Verbose", "Performance.Light", "Performance.Verbose", "Full.Light", "Full.Verbose", "SpinQuic.Light")]
+    [ValidateSet("Basic.Light", "Datapath.Light", "Datapath.Verbose", "Stacks.Light", "RPS.Light", "Performance.Light", "Basic.Verbose", "Performance.Light", "Performance.Verbose", "Full.Light", "Full.Verbose", "SpinQuic.Light")]
     [string]$Profile = "Full.Light",
 
     [Parameter(Mandatory = $false, ParameterSetName='Cancel')]
@@ -145,6 +145,7 @@ function Log-Cancel {
             wpr.exe -cancel -instancename $InstanceName 2>&1
         } catch {
         }
+        $global:LASTEXITCODE = 0
     } elseif ($IsMacOS) {
     } else {
         if (!(Test-Path $TempDir)) {

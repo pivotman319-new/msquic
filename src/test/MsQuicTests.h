@@ -39,6 +39,14 @@ void QuicTestDesiredVersionSettings();
 void QuicTestValidateParamApi();
 
 //
+// Ownership tests
+//
+void QuicTestRegistrationShutdownBeforeConnOpen();
+void QuicTestRegistrationShutdownAfterConnOpen();
+void QuicTestRegistrationShutdownAfterConnOpenBeforeStart();
+void QuicTestRegistrationShutdownAfterConnOpenAndStart();
+
+//
 // Rejection Tests
 //
 void QuicTestConnectionRejection(bool RejectByClosing);
@@ -418,6 +426,14 @@ QuicTestStreamPriority(
 
 void
 QuicTestStreamDifferentAbortErrors(
+    );
+
+void
+QuicTestStreamAbortRecvFinRace(
+    );
+
+void
+QuicTestStreamAbortConnFlowControl(
     );
 
 //
@@ -933,4 +949,22 @@ typedef struct {
 #define IOCTL_QUIC_RUN_CONNECT_INVALID_ADDRESS \
     QUIC_CTL_CODE(77, METHOD_BUFFERED, FILE_WRITE_DATA)
 
-#define QUIC_MAX_IOCTL_FUNC_CODE 77
+#define IOCTL_QUIC_RUN_STREAM_ABORT_RECV_FIN_RACE \
+    QUIC_CTL_CODE(78, METHOD_BUFFERED, FILE_WRITE_DATA)
+
+#define IOCTL_QUIC_RUN_STREAM_ABORT_CONN_FLOW_CONTROL \
+    QUIC_CTL_CODE(79, METHOD_BUFFERED, FILE_WRITE_DATA)
+
+#define IOCTL_QUIC_RUN__REG_SHUTDOWN_BEFORE_OPEN \
+    QUIC_CTL_CODE(80, METHOD_BUFFERED, FILE_WRITE_DATA)
+
+#define IOCTL_QUIC_RUN_REG_SHUTDOWN_AFTER_OPEN \
+    QUIC_CTL_CODE(81, METHOD_BUFFERED, FILE_WRITE_DATA)
+
+#define IOCTL_QUIC_RUN_REG_SHUTDOWN_AFTER_OPEN_BEFORE_START \
+    QUIC_CTL_CODE(82, METHOD_BUFFERED, FILE_WRITE_DATA)
+
+#define IOCTL_QUIC_RUN_REG_SHUTDOWN_AFTER_OPEN_AND_START \
+    QUIC_CTL_CODE(83, METHOD_BUFFERED, FILE_WRITE_DATA)
+
+#define QUIC_MAX_IOCTL_FUNC_CODE 83

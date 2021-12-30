@@ -240,7 +240,7 @@ QuicTestCtlEvtFileCreate(
     PAGED_CODE();
 
     KeEnterGuardedRegion();
-    ExfAcquirePushLockExclusive(&QuicTestCtlExtension->Lock);
+    ExAcquirePushLockExclusive(&QuicTestCtlExtension->Lock);
 
     do
     {
@@ -283,7 +283,7 @@ QuicTestCtlEvtFileCreate(
     }
     while (false);
 
-    ExfReleasePushLockExclusive(&QuicTestCtlExtension->Lock);
+    ExReleasePushLockExclusive(&QuicTestCtlExtension->Lock);
     KeLeaveGuardedRegion();
 
     WdfRequestComplete(Request, Status);
@@ -313,7 +313,7 @@ QuicTestCtlEvtFileCleanup(
     QUIC_TEST_CLIENT* Client = QuicTestCtlGetFileContext(FileObject);
     if (Client != nullptr) {
 
-        ExfAcquirePushLockExclusive(&QuicTestCtlExtension->Lock);
+        ExAcquirePushLockExclusive(&QuicTestCtlExtension->Lock);
 
         //
         // Remove the device client from the list
@@ -321,7 +321,7 @@ QuicTestCtlEvtFileCleanup(
         RemoveEntryList(&Client->Link);
         QuicTestCtlExtension->ClientListSize--;
 
-        ExfReleasePushLockExclusive(&QuicTestCtlExtension->Lock);
+        ExReleasePushLockExclusive(&QuicTestCtlExtension->Lock);
 
         QuicTraceLogInfo(
             TestControlClientCleaningUp,
@@ -448,6 +448,12 @@ size_t QUIC_IOCTL_BUFFER_SIZES[] =
     sizeof(UINT8),
     sizeof(INT32),
     0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
 };
 
 CXPLAT_STATIC_ASSERT(
@@ -1113,6 +1119,30 @@ QuicTestCtlEvtIoDeviceControl(
 
     case IOCTL_QUIC_RUN_CONNECT_INVALID_ADDRESS:
         QuicTestCtlRun(QuicTestConnectInvalidAddress());
+        break;
+
+    case IOCTL_QUIC_RUN_STREAM_ABORT_RECV_FIN_RACE:
+        QuicTestCtlRun(QuicTestStreamAbortRecvFinRace());
+        break;
+
+    case IOCTL_QUIC_RUN_STREAM_ABORT_CONN_FLOW_CONTROL:
+        QuicTestCtlRun(QuicTestStreamAbortConnFlowControl());
+        break;
+
+    case IOCTL_QUIC_RUN__REG_SHUTDOWN_BEFORE_OPEN:
+        QuicTestCtlRun(QuicTestRegistrationShutdownBeforeConnOpen());
+        break;
+
+    case IOCTL_QUIC_RUN_REG_SHUTDOWN_AFTER_OPEN:
+        QuicTestCtlRun(QuicTestRegistrationShutdownAfterConnOpen());
+        break;
+
+    case IOCTL_QUIC_RUN_REG_SHUTDOWN_AFTER_OPEN_BEFORE_START:
+        QuicTestCtlRun(QuicTestRegistrationShutdownAfterConnOpenBeforeStart());
+        break;
+
+    case IOCTL_QUIC_RUN_REG_SHUTDOWN_AFTER_OPEN_AND_START:
+        QuicTestCtlRun(QuicTestRegistrationShutdownAfterConnOpenAndStart());
         break;
 
     default:
